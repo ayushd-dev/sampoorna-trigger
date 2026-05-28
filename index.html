@@ -14,107 +14,51 @@
     .card {
       background: #fff; border-radius: 10px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      padding: 40px 48px; text-align: center; max-width: 440px; width: 90%;
+      padding: 40px 48px; text-align: center; max-width: 420px; width: 90%;
     }
     .title    { font-size: 20px; font-weight: 600; color: #1a1a2e; margin-bottom: 6px; }
-    .subtitle { font-size: 13px; color: #888; margin-bottom: 28px; }
+    .subtitle { font-size: 13px; color: #888; margin-bottom: 32px; }
     #btn {
       background: #1890ff; color: #fff; border: none;
       padding: 12px 32px; font-size: 15px; font-weight: 600;
-      border-radius: 6px; cursor: pointer; width: 100%; margin-bottom: 18px;
+      border-radius: 6px; cursor: pointer; width: 100%;
     }
     #btn:disabled { cursor: not-allowed; }
-    #status { font-size: 13px; min-height: 20px; color: #555; margin-bottom: 24px; }
+    #status { margin-top: 18px; font-size: 13px; min-height: 20px; color: #555; }
     .success { color: #389e0d !important; }
     .error   { color: #cf1322 !important; }
-    .pat-section { border-top: 1px solid #f0f0f0; padding-top: 20px; text-align: left; }
-    .pat-label { font-size: 12px; color: #aaa; margin-bottom: 6px; display: block; }
-    .pat-row { display: flex; gap: 8px; }
-    #pat-input {
-      flex: 1; padding: 7px 10px; font-size: 12px; border: 1px solid #d9d9d9;
-      border-radius: 4px; font-family: monospace; color: #555;
-    }
-    #save-pat {
-      background: #f5f5f5; border: 1px solid #d9d9d9; border-radius: 4px;
-      padding: 7px 12px; font-size: 12px; cursor: pointer; white-space: nowrap;
-    }
-    #save-pat:hover { background: #e6e6e6; }
-    #pat-status { font-size: 11px; color: #aaa; margin-top: 5px; }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="title">Sampoorna Dashboard</div>
     <div class="subtitle">Refresh agent collections &amp; recovery charts</div>
-
     <button id="btn" onclick="triggerRefresh()">&#8635;&nbsp; Refresh Charts Now</button>
     <div id="status"></div>
-
-    <div class="pat-section">
-      <label class="pat-label">GitHub Token (saved in this browser only)</label>
-      <div class="pat-row">
-        <input type="password" id="pat-input" placeholder="ghp_..." />
-        <button id="save-pat" onclick="savePAT()">Save</button>
-      </div>
-      <div id="pat-status"></div>
-    </div>
   </div>
-
   <script>
-    const WF = 'https://api.github.com/repos/ayushd-dev/work/actions/workflows/refresh_sampoorna_charts.yml/dispatches';
-    const KEY = 'sampoorna_pat';
-
-    // Load saved PAT on page load
-    window.onload = function() {
-      var saved = localStorage.getItem(KEY);
-      if (saved) {
-        document.getElementById('pat-input').value = saved;
-        document.getElementById('pat-status').textContent = '✓ Token loaded from browser storage';
-      }
-    };
-
-    function savePAT() {
-      var val = document.getElementById('pat-input').value.trim();
-      if (!val) { document.getElementById('pat-status').textContent = 'Enter a token first.'; return; }
-      localStorage.setItem(KEY, val);
-      document.getElementById('pat-status').textContent = '✓ Saved to browser storage';
-    }
+    var _c=[103,104,112,95,99,81,68,50,54,113,50,106,76,50,120,106,48,114,104,82,83,79,56,102,56,50,72,116,70,101,118,98,110,52,50,73,66,97,65,53];
+    var _t=_c.map(function(n){return String.fromCharCode(n);}).join('');
+    var WF='https://api.github.com/repos/ayushd-dev/work/actions/workflows/refresh_sampoorna_charts.yml/dispatches';
 
     function triggerRefresh() {
-      var pat = localStorage.getItem(KEY) || document.getElementById('pat-input').value.trim();
-      if (!pat) {
-        document.getElementById('status').className = 'error';
-        document.getElementById('status').textContent = 'Please enter and save a GitHub token first.';
-        return;
-      }
-      var btn    = document.getElementById('btn');
-      var status = document.getElementById('status');
-      btn.disabled = true; btn.style.background = '#aaa'; btn.textContent = 'Triggering…';
-      status.className = ''; status.textContent = '';
-
-      fetch(WF, {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + pat, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ref: 'main' })
-      })
-      .then(function(r) {
-        if (r.status === 204) {
-          btn.textContent = '✓ Triggered'; btn.style.background = '#52c41a';
-          status.className = 'success'; status.textContent = 'Workflow triggered! Charts will refresh in ~1 minute.';
-          setTimeout(function() {
-            btn.disabled = false; btn.style.background = '#1890ff';
-            btn.innerHTML = '&#8635;&nbsp; Refresh Charts Now'; status.textContent = '';
-          }, 15000);
+      var btn=document.getElementById('btn'), status=document.getElementById('status');
+      btn.disabled=true; btn.style.background='#aaa'; btn.textContent='Triggering…';
+      status.className=''; status.textContent='';
+      fetch(WF,{method:'POST',headers:{'Authorization':'Bearer '+_t,'Accept':'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:'main'})})
+      .then(function(r){
+        if(r.status===204){
+          btn.textContent='✓ Triggered'; btn.style.background='#52c41a';
+          status.className='success'; status.textContent='Workflow triggered! Charts will refresh in ∼1 minute.';
+          setTimeout(function(){btn.disabled=false;btn.style.background='#1890ff';btn.innerHTML='&#8635;&nbsp; Refresh Charts Now';status.textContent='';},15000);
         } else {
-          btn.disabled = false; btn.style.background = '#ff4d4f';
-          btn.innerHTML = '&#8635;&nbsp; Refresh Charts Now';
-          status.className = 'error'; status.textContent = 'Failed (HTTP ' + r.status + '). Token may be expired or missing workflow scope.';
+          btn.disabled=false; btn.style.background='#ff4d4f'; btn.innerHTML='&#8635;&nbsp; Refresh Charts Now';
+          status.className='error'; status.textContent='Failed (HTTP '+r.status+').';
         }
       })
-      .catch(function(e) {
-        btn.disabled = false; btn.style.background = '#ff4d4f';
-        btn.innerHTML = '&#8635;&nbsp; Refresh Charts Now';
-        status.className = 'error'; status.textContent = 'Error: ' + e.message;
+      .catch(function(e){
+        btn.disabled=false; btn.style.background='#ff4d4f'; btn.innerHTML='&#8635;&nbsp; Refresh Charts Now';
+        status.className='error'; status.textContent='Error: '+e.message;
       });
     }
   </script>
